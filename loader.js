@@ -1,6 +1,7 @@
 /**
  * Original source: https://github.com/BiosNod/Live-data-loader.git
  * 🧡 Bring back some data for your game and have fun
+ * Our discord invite: https://discord.gg/7SSwvGMK
  */
 
 const download = require('download')
@@ -108,13 +109,18 @@ const resolvers =
                     const saveFileFolder = `${__dirname}/downloads/${fileFolder}`
                     const saveFilePath = `${saveFileFolder}/${mapper}`
 
-                    console.log(mapperUrl)
-
                     if (!fs.existsSync(saveFilePath)) {
                         fs.mkdirSync(saveFileFolder, {recursive: true})
                         console.log(`downloading ${mapperUrl}`)
-                        fs.writeFileSync(saveFilePath, await download(mapperUrl))
+                        try {
+                            fs.writeFileSync(saveFilePath, await download(mapperUrl))
+                        }
+                        catch (e) {
+                            console.log(e)
+                        }
                     }
+                    else
+                        console.log(`already exists: ${mapperUrl}`)
 
                     const mapperLines = fs.readFileSync(saveFilePath).toString().split("\n")
 
@@ -154,15 +160,22 @@ const resolvers =
                             extFolder = ''
 
                         const tmpFileSavePath = `${saveFileFolder}/${extFolder}/${mapperData.remoteName}`
+                        const tmpFileSaveFolder = tmpFileSavePath.split('/').slice(0, -1).join('/')
+                        const tmpFileUrl = `${mainUrl}/${fileFolder}/${extFolder}/${mapperData.remoteName}`.replace(`${fileFolder}//`, `${fileFolder}/`)
+
 
                         if (!fs.existsSync(tmpFileSavePath)) {
-                            const tmpFileSaveFolder = tmpFileSavePath.split('/').slice(0, -1).join('/')
                             fs.mkdirSync(tmpFileSaveFolder, {recursive: true})
-
-                            const tmpFileUrl = `${mainUrl}/${fileFolder}/${extFolder}/${mapperData.remoteName}`.replace(`${fileFolder}//`, `${fileFolder}/`)
                             console.log(`downloading ${tmpFileUrl}`)
-                            fs.writeFileSync(tmpFileSavePath, await download(tmpFileUrl))
+                            try {
+                                fs.writeFileSync(tmpFileSavePath, await download(tmpFileUrl))
+                            }
+                            catch (e) {
+                                console.log(e)
+                            }
                         }
+                        else
+                            console.log(`already exists ${tmpFileUrl}`)
                     }
                 }
         }
