@@ -214,6 +214,11 @@ const resolvers =
         // other have a root / folder
     };
 
+if (mainUrl.indexOf('*') > -1)
+{
+    console.log("Please replace the mainUrl to real URL without stars (*)")
+    return
+}
 
 (async () => {
     for (const [version, versionDatas] of Object.entries(versions))
