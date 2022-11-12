@@ -10,9 +10,10 @@ The main anime games have a:
 If you wish bring back Nil** banner (in version 3.1) - you can download live-update and put it to the game folder and get happiness
 
 ## How to install and start?
-1) Install nodejs (search how to install on Windows, Linux, MacOS, etc)
-2) Change "mainUrl" and "versions" in the loader.js
+1) Install `nodejs` (search how to install on Windows, Linux, MacOS, etc)
+2) Change `mainUrl` to real without stars(*) and `versions` (if you want some different versions) in the `loader.js`
 3) Run terminal in the project folder (mouse right-click and run terminal)
-4) Run "npm install"
-5) Run "node loader.js"
-6) Data will gradually be loaded into the "downloads" folder in the same directory
+4) Run `npm install`
+5) Run `node loader.js`
+6) Data will gradually be loaded into the `downloads` folder in the same directory
+7) Do whatever you want with data
