@@ -1,17 +1,10 @@
 /**
- * Original source: https://github.com/BiosNod/Live-data-loader.git
- * 🧡 Bring back some data for your game and have fun
- * Our discord invite: https://discord.gg/7SSwvGMK
- */
+    Original source: https://github.com/BiosNod/Live-data-loader.git
 
-const download = require('download')
-const fs = require('fs')
+    🧡 Bring back some data for your game and have fun
+    Our discord invite: https://discord.gg/7SSwvGMK
 
-// You need to replace this link to real without stars
-const mainUrl = "https://autopatch**.yuansh**.com"
-
-/**
-    This data (client type, version, suffix) you can retrieve from dispatch (when login):
+    {Client type, version, suffix} you can retrieve from dispatch (when login) from:
     https://oseurodispat**.yuansh**.com/query_cur_region?version=OSRELWin2.8.0&lang=1&platform=1&binary=1&time=90&channel_id=1&sub_channel_id=1&account_type=1&dispatchSeed=xxxxxx
     You need to decrypt response by key (yes, it's encrypted, before 3.2 use key 3, from 3.2 it's key 5)
     If you dunno about query_cur_region, about keys and how to decrypt the response - ask in #support or #development
@@ -39,6 +32,26 @@ const mainUrl = "https://autopatch**.yuansh**.com"
     OSRELWin3.2.0_R11353770:6428631800_S11212885:766b0a2560_D11364183:175a3e3bff
     OSRELWin3.2.0_R11353770:6428631800_S11212885:766b0a2560_D11404032:d92901d0b2
  */
+
+const download = require('download')
+const fs = require('fs')
+
+// You need to replace this link to real without stars
+const mainUrl = "https://autopatch**.yuansh**.com"
+// Check and remove zero size files (this can slow down data processing)
+const isDelZeroFiles = false;
+
+function checkAndDelZeroFile(filePath)
+{
+    if (!isDelZeroFiles) return
+
+    if (fs.existsSync(filePath) && fs.statSync(filePath).size === 0)
+    {
+        console.log(`empty ${filePath}, unlinking...`)
+        fs.unlinkSync(filePath)
+    }
+}
+
 const versions =
     {
         '1.4_live': [
@@ -119,7 +132,7 @@ const versions =
 
         '3.0_live': [
             {
-                // 200 + Sound data in AudioAssets (Japanese, Korean, etc...)
+                // 200 base version with sound data in AudioAssets (Japanese, Korean, etc...)
                 res: {Version: 9624836, Suffix: "ed0599bc5b"},
             },
 
@@ -141,6 +154,11 @@ const versions =
                 clientSilence: {Version: 10289512, Suffix: "36a8dc6d48"},
                 // 200
                 client: {Version: 10350544, Suffix: "7a97cd5fbb"},
+            },
+
+            {
+                // 200 base version with sound data in AudioAssets (Japanese, Korean, etc...)
+                res: {Version: 10457664, Suffix: "3bdde23eb8"},
             },
 
             {
@@ -189,7 +207,9 @@ const paths =
                 'release_res_versions_external',
                 'release_res_versions_medium',
                 'release_res_versions_streaming',
-                'base_revision'
+                'base_revision',
+                'script_version',
+                'AudioAssets/audio_versions',
             ]
         },
 
@@ -258,6 +278,8 @@ if (mainUrl.indexOf('*') > -1)
                         const saveFileFolder = `${__dirname}/downloads/${fileFolder}`
                         const saveFilePath = `${saveFileFolder}/${mapper}`
 
+                        checkAndDelZeroFile(saveFilePath)
+
                         if (!fs.existsSync(saveFilePath)) {
                             fs.mkdirSync(saveFileFolder, {recursive: true})
                             console.log(`downloading ${mapperUrl}`)
@@ -268,6 +290,9 @@ if (mainUrl.indexOf('*') > -1)
                             }
                         } else
                             console.log(`already exists: ${mapperUrl}`)
+
+                        // There are no JSON
+                        if (['script_version', 'base_revision'].includes(mapper)) continue
 
                         const mapperLines = fs.readFileSync(saveFilePath).toString().split("\n")
 
@@ -310,6 +335,7 @@ if (mainUrl.indexOf('*') > -1)
                             const tmpFileSaveFolder = tmpFileSavePath.split('/').slice(0, -1).join('/')
                             const tmpFileUrl = `${mainUrl}/${fileFolder}/${extFolder}/${mapperData.remoteName}`.replace(`${fileFolder}//`, `${fileFolder}/`)
 
+                            checkAndDelZeroFile(tmpFileSavePath)
 
                             if (!fs.existsSync(tmpFileSavePath)) {
                                 fs.mkdirSync(tmpFileSaveFolder, {recursive: true})
