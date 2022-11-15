@@ -2,7 +2,7 @@
     Original source: https://github.com/BiosNod/Live-data-loader.git
 
     🧡 Bring back some data for your game and have fun
-    Our discord invite: https://discord.gg/7SSwvGMK
+    Our discord invite: https://discord.gg/MfxYRNdD9x
 
     {Client type, version, suffix} you can retrieve from dispatch (when login) from:
     https://oseurodispat**.yuansh**.com/query_cur_region?version=OSRELWin2.8.0&lang=1&platform=1&binary=1&time=90&channel_id=1&sub_channel_id=1&account_type=1&dispatchSeed=xxxxxx
