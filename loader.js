@@ -33,24 +33,11 @@
     OSRELWin3.2.0_R11353770:6428631800_S11212885:766b0a2560_D11404032:d92901d0b2
  */
 
-const download = require('download')
 const fs = require('fs')
+const helpers = require("./helpers");
 
 // You need to replace this link to real without stars
 const mainUrl = "https://autopatch**.yuansh**.com"
-// Check and remove zero size files (this can slow down data processing)
-const isDelZeroFiles = false;
-
-function checkAndDelZeroFile(filePath)
-{
-    if (!isDelZeroFiles) return
-
-    if (fs.existsSync(filePath) && fs.statSync(filePath).size === 0)
-    {
-        console.log(`empty ${filePath}, unlinking...`)
-        fs.unlinkSync(filePath)
-    }
-}
 
 const versions =
     {
@@ -278,18 +265,7 @@ if (mainUrl.indexOf('*') > -1)
                         const saveFileFolder = `${__dirname}/downloads/${fileFolder}`
                         const saveFilePath = `${saveFileFolder}/${mapper}`
 
-                        checkAndDelZeroFile(saveFilePath)
-
-                        if (!fs.existsSync(saveFilePath)) {
-                            fs.mkdirSync(saveFileFolder, {recursive: true})
-                            console.log(`downloading ${mapperUrl}`)
-                            try {
-                                fs.writeFileSync(saveFilePath, await download(mapperUrl))
-                            } catch (e) {
-                                console.log(e)
-                            }
-                        } else
-                            console.log(`already exists: ${mapperUrl}`)
+                        await helpers.forceDownload(mapperUrl, saveFilePath)
 
                         // There are no JSON
                         if (['script_version', 'base_revision'].includes(mapper)) continue
@@ -331,22 +307,10 @@ if (mainUrl.indexOf('*') > -1)
                             if (extFolder && saveFileFolder.indexOf(extFolder) > -1)
                                 extFolder = ''
 
-                            const tmpFileSavePath = `${saveFileFolder}/${extFolder}/${mapperData.remoteName}`
-                            const tmpFileSaveFolder = tmpFileSavePath.split('/').slice(0, -1).join('/')
-                            const tmpFileUrl = `${mainUrl}/${fileFolder}/${extFolder}/${mapperData.remoteName}`.replace(`${fileFolder}//`, `${fileFolder}/`)
+                            const gameFileSavePath = `${saveFileFolder}/${extFolder}/${mapperData.remoteName}`
+                            const gameFileUrl = `${mainUrl}/${fileFolder}/${extFolder}/${mapperData.remoteName}`.replace(`${fileFolder}//`, `${fileFolder}/`)
 
-                            checkAndDelZeroFile(tmpFileSavePath)
-
-                            if (!fs.existsSync(tmpFileSavePath)) {
-                                fs.mkdirSync(tmpFileSaveFolder, {recursive: true})
-                                console.log(`downloading ${tmpFileUrl}`)
-                                try {
-                                    fs.writeFileSync(tmpFileSavePath, await download(tmpFileUrl))
-                                } catch (e) {
-                                    console.log(e)
-                                }
-                            } else
-                                console.log(`already exists ${tmpFileUrl}`)
+                            await helpers.forceDownload(gameFileUrl, gameFileSavePath)
                         }
                     }
             }
