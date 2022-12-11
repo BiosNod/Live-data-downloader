@@ -31,6 +31,9 @@
  OSRELWin3.2.0_R11149961:d6b14858bc_S11212885:766b0a2560_D11319614:f9c5287efd
  OSRELWin3.2.0_R11353770:6428631800_S11212885:766b0a2560_D11364183:175a3e3bff
  OSRELWin3.2.0_R11353770:6428631800_S11212885:766b0a2560_D11404032:d92901d0b2
+ OSRELWin3.2.0_R11611027:8bf0cf5f3d_S11212885:766b0a2560_D11793813:1bb7eba264
+ OSRELWin3.3.0_R11972804:a46af65d51_S11938958:b040c0ebeb_D11990274:d46e5e55e2 - day1 hotfix
+ OSRELWin3.3.0_R11972804:a46af65d51_S11938958:b040c0ebeb_D12100776:793a112718 - maybe BP issue fix?
  */
 
 const fs = require('fs')
@@ -58,6 +61,12 @@ const versions =
         ],
 
         '1.5_live': [
+            {
+                res: {Version: 2484655, Suffix: "d25bf77fa4"},
+                clientSilence: {Version: 2494513, Suffix: "3ddaee14c9"},
+                client: {Version: 2502139, Suffix: "d0d890eb69"},
+            },
+
             {
                 res: {Version: 2663089, Suffix: "25a12eeea5"},
                 clientSilence: {Version: 2771742, Suffix: "99f775138c"},
@@ -149,6 +158,36 @@ const versions =
                 clientSilence: {Version: 10805493, Suffix: "3222597d09"},
                 client: {Version: 10941477, Suffix: "af48dac880"},
             }
+        ],
+
+        '3.2_live': [
+            {
+                res: {Version: 11149961, Suffix: "d6b14858bc"},
+                clientSilence: {Version: 11212885, Suffix: "766b0a2560"},
+                client: {Version: 11319614, Suffix: "f9c5287efd"},
+            },
+
+            {
+                res: {Version: 11353770, Suffix: "6428631800"},
+                client: {Version: 11364183, Suffix: "175a3e3bff"},
+            },
+
+            {
+                client: {Version: 11404032, Suffix: "d92901d0b2"},
+            },
+
+            {
+                res: {Version: 11611027, Suffix: "8bf0cf5f3d"},
+                client: {Version: 11793813, Suffix: "1bb7eba264"},
+            },
+        ],
+
+        '3.3_live': [
+            {
+                res: {Version: 11972804, Suffix: "a46af65d51"},
+                clientSilence: {Version: 11938958, Suffix: "b040c0ebeb"},
+                client: {Version: 12136874, Suffix: "f3a4b38d81"},
+            },
         ],
 
         '3.4_live': [
