@@ -42,6 +42,7 @@ const helpers = require("./helpers");
 // You need to replace this link to real without stars
 const mainUrl = "https://autopatchhk.yuanshen.com"
 
+// You can change versions to some another list, like "./versions.beta" if you have beta list 👀
 const versions = require('./versions.release')
 
 const paths =

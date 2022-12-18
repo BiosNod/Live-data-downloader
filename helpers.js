@@ -38,15 +38,15 @@ function checkAndDelZeroFile(filePath) {
 
 async function forceDownload(link, fileFullPath) {
     // if you want to download only with some ext
-    if (link.indexOf('.zip') > -1) return
+    // if (link.indexOf('.zip') > -1) return
 
     if (isDelZeroFiles) checkAndDelZeroFile(fileFullPath)
 
     const fileFolder = fileFullPath.split('/').slice(0, -1).join('/')
 
     if (!fs.existsSync(fileFullPath)) {
+        // console.log("creating dir:", fileFolder)
         fs.mkdirSync(fileFolder, {recursive: true})
-        console.log(`downloading ${link}`)
         try {
             const tmpExt = '.~tmp'
             const fileFullTempPath = fileFullPath + tmpExt
@@ -57,18 +57,28 @@ async function forceDownload(link, fileFullPath) {
             const fileStream = fs.createWriteStream(fileFullTempPath)
             const loader = link.indexOf('https') === 0 ? https : http
 
-            loader.get(link, {timeout: 10000}, (response) => response.pipe(fileStream))
+            console.log(`downloading ${link}`);
 
-            // Wait until file downloaded
-            await util.promisify(stream.finished)(fileStream).then(() => {
-                // Rename tmp file name to original name
-                fs.renameSync(fileFullTempPath, fileFullPath)
-            }).finally(() => {
-                // Unlink tmp file if some error occurs while downloading
-                unlinkIfExists(fileFullTempPath)
-            })
+            await (new Promise ((resolve, reject) => {
+                const request = loader.get(link);
 
-            console.log('downloaded and saved')
+                request.on('response', (response) => {
+                    response.pipe(fileStream)
+
+                    // Rename tmp file name to the original name
+                    fs.renameSync(fileFullTempPath, fileFullPath)
+
+                    resolve(response);
+                });
+
+                request.on( 'error', (err) => {
+                    console.error('An error occurred');
+                    resolve(err);
+                })
+            }))
+
+            // Unlink tmp file if some error occurs while downloading
+            unlinkIfExists(fileFullTempPath)
         } catch (e) {
             console.log('error:', e)
         }
@@ -76,4 +86,27 @@ async function forceDownload(link, fileFullPath) {
         console.log(`skip, already exists ${fileFullPath}`)
 }
 
-module.exports = {forceDownload, getMd5Data}
+function trimAny(str, chars) {
+    let start = 0, end = str.length;
+
+    while(start < end && chars.indexOf(str[start]) >= 0)
+        ++start;
+
+    while(end > start && chars.indexOf(str[end - 1]) >= 0)
+        --end;
+
+    return (start > 0 || end < str.length) ? str.substring(start, end) : str;
+}
+
+function getFileName(path)
+{
+    return trimAny(path, ' /\\').split('\\').pop().split('/').pop()
+}
+
+function getFileExt(path)
+{
+    const match = path.match(/\.([^\./\?]+)($|\?)/);
+    return match ? match[1] : null
+}
+
+module.exports = {forceDownload, getMd5Data, trimAny, getFileName, getFileExt}

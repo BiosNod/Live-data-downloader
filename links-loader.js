@@ -18,8 +18,19 @@ const subFolder = 'downloads'
                 throw `Separator ${urlSeparator} not found in ${link}`
 
             const filePath = link.split(urlSeparator)[1]
-            const fileFullPath = `${__dirname}/${subFolder}/${filePath}`
-            await helpers.forceDownload(link, fileFullPath)
+            const fileName = helpers.getFileName(filePath);
+            const fileExt = helpers.getFileExt(fileName)
+
+            // if (!fileExt) console.warn(`File extension not found in ${link}`)
+
+            const lastChar = link.substr(link.length - 1);
+
+            if (lastChar === '/')
+                console.warn(`Folder instead of file found in ${link}, skip it`)
+            else {
+                const fileFullPath = `${__dirname}/${subFolder}/${filePath}`
+                await helpers.forceDownload(link, fileFullPath)
+            }
         }
     }
 })()
