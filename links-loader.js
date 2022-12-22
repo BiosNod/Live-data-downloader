@@ -14,8 +14,10 @@ const subFolder = 'downloads'
         for (let link of links) {
             if (!link) continue
 
-            if (link.indexOf(urlSeparator) === -1)
-                throw `Separator ${urlSeparator} not found in ${link}`
+            if (link.indexOf(urlSeparator) === -1) {
+                console.warn(`Separator ${urlSeparator} not found in ${link}, skip it`)
+                continue
+            }
 
             const filePath = link.split(urlSeparator)[1]
             const fileName = helpers.getFileName(filePath);
@@ -28,7 +30,7 @@ const subFolder = 'downloads'
             if (lastChar === '/')
                 console.warn(`Folder instead of file found in ${link}, skip it`)
             else {
-                const fileFullPath = `${__dirname}/${subFolder}/${filePath}`
+                const fileFullPath = `${__dirname.replaceAll('\\', '/')}/${subFolder}/${filePath}`
                 await helpers.forceDownload(link, fileFullPath)
             }
         }
