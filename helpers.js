@@ -37,6 +37,10 @@ function checkAndDelZeroFile(filePath) {
     }
 }
 
+function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function forceDownload(link, fileFullPath) {
     // if you want to download only with some ext
     // if (link.indexOf('.zip') > -1) return
@@ -53,7 +57,8 @@ async function forceDownload(link, fileFullPath) {
         console.log(`creating dir:`, fileFolder)
         fs.mkdirSync(fileFolder, {recursive: true})
         try {
-            const fileFullTempPath = fileFullPath + '.~tmp'
+            const tmpExt = '.~tmp'
+            const fileFullTempPath = fileFullPath + tmpExt
 
             console.log(`Creating temp file`, fileFullTempPath)
             // Maybe previous download process crashed
@@ -61,6 +66,11 @@ async function forceDownload(link, fileFullPath) {
 
             const fileStream = fs.createWriteStream(fileFullTempPath)
             const loader = link.indexOf('https') === 0 ? https : http
+            let downloaded = false;
+
+            fileStream.on("end", () => {
+                downloaded = true;
+            });
 
             console.log(`downloading ${link}`);
 
@@ -79,8 +89,11 @@ async function forceDownload(link, fileFullPath) {
             }))
 
             // Waiting responce pipe
-            await finished(fileStream);
+            // await finished(fileStream);
+            while (!downloaded)
+                await timeout(10000);
 
+            console.log(`downloaded, removing ${tmpExt} ext`)
             // Rename tmp file name to the original name
             fs.renameSync(fileFullTempPath, fileFullPath)
 
