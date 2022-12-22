@@ -41,18 +41,25 @@ function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function removeControlChars(str) {
+    return str.replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
+}
+
 async function forceDownload(link, fileFullPath) {
+    // Remove all control characters in Unicode
+    link = trimAny(removeControlChars(link))
+    fileFullPath = trimAny(removeControlChars(fileFullPath))
+
+    // if (link.indexOf('oversea_beta') === -1) return
     // if you want to download only with some ext
     // if (link.indexOf('.zip') > -1) return
 
-    // Remove all control characters in Unicode
-    fileFullPath = fileFullPath.replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
     // Check zero files
     if (isDelZeroFiles) checkAndDelZeroFile(fileFullPath)
 
     const fileFolder = fileFullPath.split('/').slice(0, -1).join('/')
-
     console.log('fileFullPath', fileFullPath)
+
     if (!fs.existsSync(fileFullPath)) {
         console.log(`creating dir:`, fileFolder)
         fs.mkdirSync(fileFolder, {recursive: true})
@@ -61,10 +68,13 @@ async function forceDownload(link, fileFullPath) {
             const fileFullTempPath = fileFullPath + tmpExt
 
             console.log(`Creating temp file`, fileFullTempPath)
-            // Maybe previous download process crashed
-            unlinkIfExists(fileFullTempPath)
+            // To disable tmp files download resuming, uncomment:
+            // unlinkIfExists(fileFullTempPath)
 
-            const fileStream = fs.createWriteStream(fileFullTempPath)
+            const isTmpExists = fs.existsSync(fileFullTempPath)
+            const fileStream = fs.createWriteStream(fileFullTempPath, isTmpExists ? {flags: 'a'} : {})
+            let stats = isTmpExists ? fs.statSync(fileFullTempPath) : {size: 0}
+
             const loader = link.indexOf('https') === 0 ? https : http
             let downloaded = false;
 
@@ -74,28 +84,69 @@ async function forceDownload(link, fileFullPath) {
 
             console.log(`downloading ${link}`);
 
-            await (new Promise ((resolve, reject) => {
-                const request = loader.get(link);
+            // Variables to show downloading progress
+            let received_bytes = 0, total_bytes = 0
 
-                request.on('response', (response) => {
-                    response.pipe(fileStream)
-                    resolve(response);
-                });
+            function makeRequest() {
+                const location = new URL(link);
 
-                request.on( 'error', (err) => {
-                    console.error('An error occurred');
-                    resolve(err);
+                // Resume bytes if tmp partially downloaded before
+                const headers =
+                    {
+                        'Accept-Ranges': 'arraybuffer',
+                        'Response-Type': 'arraybuffer',
+                        'Range': `bytes=${stats.size}-`
+                    }
+
+                const options = {
+                    hostname: location.hostname,
+                    path: location.pathname,
+                    headers: headers
+                }
+
+                return loader.get(options).on('response', (response) => {
+                    total_bytes = parseInt(response.headers['content-length']);
+                    console.log("Total bytes: ", total_bytes)
+
+                    response
+                        .on('error', (err) => {
+                            console.error('An error occurred', err);
+                        })
+                        .on('data', function (chunk) {
+                            //gets percentage after every chunk
+                            received_bytes += chunk.length;
+                            console.log(`[${link}] bytes: ${received_bytes}/${total_bytes}, ${(received_bytes * 100 / total_bytes).toFixed(2)}%`)
+                            // allow external code to continue
+                            if (received_bytes === total_bytes)
+                                downloaded = true
+                        })
+                        .pipe(fileStream)
                 })
-            }))
+            }
 
-            // Waiting responce pipe
-            // await finished(fileStream);
-            while (!downloaded)
-                await timeout(10000);
+            let request = makeRequest()
+
+            let last_received_bytes = 0
+            // Waiting for response pipe and checking network stuck
+            while (!downloaded) {
+                await timeout(15000);
+                if (last_received_bytes !== received_bytes)
+                    last_received_bytes = received_bytes
+                else
+                {
+                    console.warn("network stuck, trying to resume...")
+                    // recalculate stats to know last byte number to resume
+                    stats = fs.statSync(fileFullTempPath)
+                    // restart + resume
+                    request = makeRequest()
+                }
+            }
 
             console.log(`downloaded, removing ${tmpExt} ext`)
             // Rename tmp file name to the original name
             fs.renameSync(fileFullTempPath, fileFullPath)
+            // For debug
+            // process.exit(1);
 
             // Unlink tmp file if some error occurs while downloading
             unlinkIfExists(fileFullTempPath)
@@ -106,7 +157,7 @@ async function forceDownload(link, fileFullPath) {
         console.log(`skip, already exists ${fileFullPath}`)
 }
 
-function trimAny(str, chars) {
+function trimAny(str, chars = ' ') {
     let start = 0, end = str.length;
 
     while(start < end && chars.indexOf(str[start]) >= 0)
@@ -129,4 +180,4 @@ function getFileExt(path)
     return match ? match[1] : null
 }
 
-module.exports = {forceDownload, getMd5Data, trimAny, getFileName, getFileExt}
+module.exports = {forceDownload, getMd5Data, trimAny, getFileName, getFileExt, removeControlChars}

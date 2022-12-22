@@ -12,6 +12,7 @@ const subFolder = 'downloads'
         const links = fs.readFileSync(`${linksFolder}/${linksFile}`).toString().split("\n")
 
         for (let link of links) {
+            link = helpers.removeControlChars(link)
             if (!link) continue
 
             if (link.indexOf(urlSeparator) === -1) {
@@ -22,9 +23,7 @@ const subFolder = 'downloads'
             const filePath = link.split(urlSeparator)[1]
             const fileName = helpers.getFileName(filePath);
             const fileExt = helpers.getFileExt(fileName)
-
             // if (!fileExt) console.warn(`File extension not found in ${link}`)
-
             const lastChar = link.substr(link.length - 1);
 
             if (lastChar === '/')
