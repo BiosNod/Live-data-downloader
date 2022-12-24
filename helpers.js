@@ -118,7 +118,7 @@ async function forceDownload(link, fileFullPath) {
 
                 return loader.get(options).on('response', (response) => {
                     total_bytes = parseInt(response.headers['content-length']);
-                    console.log("Total bytes: ", total_bytes)
+                    console.log("Total size: ", formatFileSize(total_bytes))
 
                     response
                         .on('error', (err) => {
@@ -137,21 +137,27 @@ async function forceDownload(link, fileFullPath) {
             }
 
             let request = makeRequest()
-
             let last_received_bytes = 0
+            let last_time_diff = Date.now()
+
             // Waiting for response pipe and checking network stuck
             while (!downloaded) {
-                await timeout(15000);
-                if (last_received_bytes !== received_bytes)
-                    last_received_bytes = received_bytes
-                else
-                {
-                    console.warn("network stuck, trying to resume...")
-                    // recalculate stats to know last byte number to resume
-                    stats = fs.statSync(fileFullTempPath)
-                    received_bytes = total_bytes = 0
-                    // restart + resume
-                    request = makeRequest()
+                await timeout(100);
+
+                // If after 5 sec no changes
+                if (Date.now() - last_time_diff > 5000) {
+                    last_time_diff = Date.now()
+
+                    if (last_received_bytes !== received_bytes)
+                        last_received_bytes = received_bytes
+                    else {
+                        console.warn("network stuck, trying to resume...")
+                        // recalculate stats to know last byte number to resume
+                        stats = fs.statSync(fileFullTempPath)
+                        received_bytes = total_bytes = 0
+                        // restart + resume
+                        request = makeRequest()
+                    }
                 }
             }
 
