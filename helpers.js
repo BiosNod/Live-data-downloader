@@ -45,6 +45,15 @@ function removeControlChars(str) {
     return str.replace(/[\u0000-\u001F\u007F-\u009F]/g, "")
 }
 
+function formatFileSize(bytes,decimalPoint) {
+    if(bytes === 0) return '0 Bytes';
+    let k = 1000,
+        dm = decimalPoint || 2,
+        sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
+        i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
 async function forceDownload(link, fileFullPath) {
     // Remove all control characters in Unicode
     link = trimAny(removeControlChars(link))
@@ -98,6 +107,9 @@ async function forceDownload(link, fileFullPath) {
                         'Range': `bytes=${stats.size}-`
                     }
 
+                // console.log(headers)
+                // process.exit(1)
+
                 const options = {
                     hostname: location.hostname,
                     path: location.pathname,
@@ -115,7 +127,7 @@ async function forceDownload(link, fileFullPath) {
                         .on('data', function (chunk) {
                             //gets percentage after every chunk
                             received_bytes += chunk.length;
-                            console.log(`[${link}] bytes: ${received_bytes}/${total_bytes}, ${(received_bytes * 100 / total_bytes).toFixed(2)}%`)
+                            console.log(`[${link}] progress: ${formatFileSize(received_bytes)}/${formatFileSize(total_bytes)}, ${(received_bytes * 100 / total_bytes).toFixed(2)}%`)
                             // allow external code to continue
                             if (received_bytes === total_bytes)
                                 downloaded = true
@@ -137,6 +149,7 @@ async function forceDownload(link, fileFullPath) {
                     console.warn("network stuck, trying to resume...")
                     // recalculate stats to know last byte number to resume
                     stats = fs.statSync(fileFullTempPath)
+                    received_bytes = total_bytes = 0
                     // restart + resume
                     request = makeRequest()
                 }
