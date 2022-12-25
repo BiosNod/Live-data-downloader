@@ -20,6 +20,11 @@
  OSRELWin1.6.1_R3305047:ecff173daf_S3266913:b1501b6955_D3353303:242157b1de
  OSRELWin1.6.1_R3557509:5979a935f8_S3266913:b1501b6955_D3526661:2b3db51945
  OSRELWin2.0.0_R3696781:eb2d9ce860_S3774214:ef5e090f93_D3774214:ef5e090f93
+ OSRELWin2.2.0_R4547778:7237ac14c3_S4645171:60d2dd6b16_D4645171:60d2dd6b16
+ OSRELWin2.3.0_R5134813:4ada34ec9f_S5082883:023295ee18_D5278928:9487c22876
+ OSRELWin2.6.0_R6708157:7a34a36a6e_S6731353:adfeb8be71_D6731353:adfeb8be71
+ OSRELWin2.7.0_R6855943:1490a59df9_S6801534:69e473b331_D6902895:d6252eb166
+ OSRELWin2.7.0_R8029328:4cecb3db74_S8227893:b9d91614c6_D8227893:b9d91614c6
  OSRELWin3.0.0_R10283122:ec58ff372e_S10446836:320895326e_D10316937:4fcac11e23
  OSRELWin3.1.0_R10676272:ab446cd9d8_S10660688:b69559f811_D10693398:99e1a99fd2
  OSRELWin3.1.0_R10676272:ab446cd9d8_S10660688:b69559f811_D10772333:09136b2529
@@ -116,11 +121,32 @@ const list =
 			},
 		],
 
+        '2.3_live': [
+            {
+                res: {Version: 5134813, Suffix: "4ada34ec9f"},
+                clientSilence: {Version: 5082883, Suffix: "023295ee18"},
+                client: {Version: 5278928, Suffix: "9487c22876"},
+            },
+        ],
+
+        '2.6_live': [
+            {
+                res: {Version: 6708157, Suffix: "7a34a36a6e"},
+                clientSilence: {Version: 6731353, Suffix: "adfeb8be71"},
+                client: {Version: 6731353, Suffix: "adfeb8be71"},
+            },
+        ],
+        
         '2.7_live': [
             {
                 res: {Version: 6855943, Suffix: "1490a59df9"},
                 clientSilence: {Version: 6801534, Suffix: "69e473b331"},
                 client: {Version: 6902895, Suffix: "d6252eb166"},
+            },
+            {
+                res: {Version: 8029328, Suffix: "4cecb3db74"},
+                clientSilence: {Version: 8227893, Suffix: "b9d91614c6"},
+                client: {Version: 8227893, Suffix: "b9d91614c6"},
             }
         ],
 
