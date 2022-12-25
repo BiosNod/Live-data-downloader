@@ -106,20 +106,21 @@ const list =
             },
         ],
 
-		'2.0_live': [
-			{
-				res: {Version: 3696781, Suffix: "eb2d9ce860"},
-				clientSilence: {Version: 3788800, Suffix: "47abc13ddb"},
-				client: {Version: 3804637, Suffix: "c78deabdb1"},
-			},
-		],
-		'2.2_live': [
-			{
-				res: {Version: 4547778, Suffix: "7237ac14c3"},
-				clientSilence: {Version: 4645171, Suffix: "60d2dd6b16"},
-				client: {Version: 4645171, Suffix: "60d2dd6b16"},
-			},
-		],
+        '2.0_live': [
+            {
+                res: {Version: 3696781, Suffix: "eb2d9ce860"},
+                clientSilence: {Version: 3788800, Suffix: "47abc13ddb"},
+                client: {Version: 3804637, Suffix: "c78deabdb1"},
+            },
+        ],
+
+        '2.2_live': [
+            {
+                res: {Version: 4547778, Suffix: "7237ac14c3"},
+                clientSilence: {Version: 4645171, Suffix: "60d2dd6b16"},
+                client: {Version: 4645171, Suffix: "60d2dd6b16"},
+            },
+        ],
 
         '2.3_live': [
             {
