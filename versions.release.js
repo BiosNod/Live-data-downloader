@@ -86,11 +86,27 @@
 
 const list =
     {
+        '1.0_rel': [
+            {
+                res: {Version: 1135452, Suffix: "1dda342ed1"},
+                clientSilence: {Version: 1141718, Suffix: "f1b1d4173a"},
+                client: {Version: 1146939, Suffix: "35b7968eda"},
+            },
+
+            {
+                res: {Version: 1139692, Suffix: "d2f2ff22c7"},
+            },
+        ],
+
         '1.0_live': [
             {
                 res: {Version: 1284249, Suffix: "ba7ad33643"},
-                clientSilence: {Version: 1393824, Suffix: "52338ab3d4"},
-                client: {Version: 1358691, Suffix: "52338ab3d4"},
+                clientSilence: {Version: 1358691, Suffix: "cdc3f383ef"},
+                client: {Version: 1358691, Suffix: "cdc3f383ef"},
+            },
+ 
+            {
+                clientSilence: {Version: 1393824, Suffix: "2599c61c7b"},
             },
         ],
 
@@ -203,6 +219,7 @@ const list =
             {
                 // base version with sound data in AudioAssets (Japanese, Korean, etc...)
                 res: {Version: 9624836, Suffix: "ed0599bc5b"},
+                client: {Version: 9915492, Suffix: "930253475d"},
             },
 
             {
